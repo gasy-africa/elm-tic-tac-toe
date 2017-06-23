@@ -5,6 +5,7 @@ import Html.Events exposing (onClick)
 import List.Extra exposing (setAt, getAt)
 import Maybe exposing (withDefault)
 import String exposing (toUpper)
+import Random exposing (generate)
 
 
 -- INTERNAL MODULES
@@ -62,6 +63,7 @@ type Msg
     = Mark Int
     | Reset
     | SetPlayer String
+    | Rand Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -83,16 +85,32 @@ update msg model =
 
                 isBoardFull =
                     handleBoardFull nextBoard
+
+                nextCmd =
+                    if model.player1 == model.turn && not isBoardFull then
+                        randoInt
+                    else
+                        Cmd.none
             in
                 { model
                     | board = nextBoard
                     , turn = nextTurn
                     , isBoardFull = isBoardFull
                 }
-                    ! []
+                    ! [ nextCmd ]
 
         Reset ->
             initModel ! []
+
+        Rand num ->
+            let
+                hasValue =
+                    getValue num model /= ""
+            in
+                if hasValue then
+                    model ! [ randoInt ]
+                else
+                    update (Mark num) model
 
         SetPlayer str ->
             { model
@@ -107,6 +125,15 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
+
+
+
+-- UPDATE HELPERS
+
+
+randoInt : Cmd Msg
+randoInt =
+    generate Rand (Random.int 0 8)
 
 
 

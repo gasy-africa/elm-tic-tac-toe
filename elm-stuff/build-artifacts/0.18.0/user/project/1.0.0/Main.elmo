@@ -73,48 +73,13 @@ var _user$project$Main$initModel = A6(
 	false,
 	false);
 var _user$project$Main$init = {ctor: '_Tuple2', _0: _user$project$Main$initModel, _1: _elm_lang$core$Platform_Cmd$none};
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'Mark':
-				var _p3 = _p2._0;
-				var nextTurn = _elm_lang$core$Native_Utils.eq(
-					A2(_user$project$Main$getValue, _p3, model),
-					'') ? _user$project$Main$handleChangeTurn(model.turn) : model.turn;
-				var nextBoard = _elm_lang$core$Native_Utils.eq(
-					A2(_user$project$Main$getValue, _p3, model),
-					'') ? A2(
-					_elm_lang$core$Maybe$withDefault,
-					{ctor: '[]'},
-					A3(_elm_community$list_extra$List_Extra$setAt, _p3, model.turn, model.board)) : model.board;
-				var isBoardFull = _user$project$Main$handleBoardFull(nextBoard);
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{board: nextBoard, turn: nextTurn, isBoardFull: isBoardFull}),
-					{ctor: '[]'});
-			case 'Reset':
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_user$project$Main$initModel,
-					{ctor: '[]'});
-			default:
-				var _p4 = _p2._0;
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							player1: _p4,
-							player2: _user$project$Main$handleChangeTurn(_p4),
-							turn: _p4,
-							hasSetPlayer: true
-						}),
-					{ctor: '[]'});
-		}
-	});
+var _user$project$Main$Rand = function (a) {
+	return {ctor: 'Rand', _0: a};
+};
+var _user$project$Main$randoInt = A2(
+	_elm_lang$core$Random$generate,
+	_user$project$Main$Rand,
+	A2(_elm_lang$core$Random$int, 0, 8));
 var _user$project$Main$SetPlayer = function (a) {
 	return {ctor: 'SetPlayer', _0: a};
 };
@@ -122,6 +87,77 @@ var _user$project$Main$Reset = {ctor: 'Reset'};
 var _user$project$Main$Mark = function (a) {
 	return {ctor: 'Mark', _0: a};
 };
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		update:
+		while (true) {
+			var _p2 = msg;
+			switch (_p2.ctor) {
+				case 'Mark':
+					var _p3 = _p2._0;
+					var nextTurn = _elm_lang$core$Native_Utils.eq(
+						A2(_user$project$Main$getValue, _p3, model),
+						'') ? _user$project$Main$handleChangeTurn(model.turn) : model.turn;
+					var nextBoard = _elm_lang$core$Native_Utils.eq(
+						A2(_user$project$Main$getValue, _p3, model),
+						'') ? A2(
+						_elm_lang$core$Maybe$withDefault,
+						{ctor: '[]'},
+						A3(_elm_community$list_extra$List_Extra$setAt, _p3, model.turn, model.board)) : model.board;
+					var isBoardFull = _user$project$Main$handleBoardFull(nextBoard);
+					var nextCmd = (_elm_lang$core$Native_Utils.eq(model.player1, model.turn) && (!isBoardFull)) ? _user$project$Main$randoInt : _elm_lang$core$Platform_Cmd$none;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{board: nextBoard, turn: nextTurn, isBoardFull: isBoardFull}),
+						{
+							ctor: '::',
+							_0: nextCmd,
+							_1: {ctor: '[]'}
+						});
+				case 'Reset':
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_user$project$Main$initModel,
+						{ctor: '[]'});
+				case 'Rand':
+					var _p4 = _p2._0;
+					var hasValue = !_elm_lang$core$Native_Utils.eq(
+						A2(_user$project$Main$getValue, _p4, model),
+						'');
+					if (hasValue) {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{
+								ctor: '::',
+								_0: _user$project$Main$randoInt,
+								_1: {ctor: '[]'}
+							});
+					} else {
+						var _v2 = _user$project$Main$Mark(_p4),
+							_v3 = model;
+						msg = _v2;
+						model = _v3;
+						continue update;
+					}
+				default:
+					var _p5 = _p2._0;
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								player1: _p5,
+								player2: _user$project$Main$handleChangeTurn(_p5),
+								turn: _p5,
+								hasSetPlayer: true
+							}),
+						{ctor: '[]'});
+			}
+		}
+	});
 var _user$project$Main$view = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
