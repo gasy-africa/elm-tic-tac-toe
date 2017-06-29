@@ -2,10 +2,11 @@ module Main exposing (..)
 
 import Html exposing (Html, div, text, button)
 import Html.Events exposing (onClick)
-import List.Extra exposing (setAt, getAt)
+import List exposing (all, any, filter)
+import List.Extra exposing (setAt, getAt, groupsOf, transpose, indexedFoldl)
 import Maybe exposing (withDefault)
-import String exposing (toUpper)
 import Random exposing (generate)
+import String exposing (toUpper)
 
 
 -- INTERNAL MODULES
@@ -23,12 +24,13 @@ type alias Model =
     , board : List String
     , isBoardFull : Bool
     , hasSetPlayer : Bool
+    , hasWinner : Bool
     }
 
 
 initModel : Model
 initModel =
-    Model "X" "O" "X" [ "", "", "", "", "", "", "", "", "" ] False False
+    Model "X" "O" "X" [ "", "", "", "", "", "", "", "", "" ] False False False
 
 
 init : ( Model, Cmd Msg )
@@ -55,6 +57,43 @@ handleBoardFull =
     not << List.any (\v -> v == "")
 
 
+hasWinner : Model -> Bool
+hasWinner { board, turn } =
+    let
+        rows =
+            groupsOf 3 board |> any (all ((==) turn))
+
+        columns =
+            groupsOf 3 board |> transpose |> any (all ((==) turn))
+
+        backward =
+            indexedFoldl
+                (\idx curr acc ->
+                    if idx == 0 || idx == 4 || idx == 8 then
+                        curr :: acc
+                    else
+                        acc
+                )
+                []
+                board
+                |> all ((==) turn)
+
+        forward =
+            indexedFoldl
+                (\idx curr acc ->
+                    if idx == 2 || idx == 4 || idx == 6 then
+                        curr :: acc
+                    else
+                        acc
+                )
+                []
+                board
+                |> all ((==) turn)
+    in
+        any (\truthy -> truthy)
+            [ rows, columns, backward, forward ]
+
+
 
 -- UPDATE
 
@@ -77,6 +116,9 @@ update msg model =
                     else
                         model.board
 
+                nextWinner =
+                    hasWinner { model | board = nextBoard }
+
                 nextTurn =
                     if getValue int model == "" then
                         handleChangeTurn model.turn
@@ -92,12 +134,15 @@ update msg model =
                     else
                         Cmd.none
             in
-                { model
-                    | board = nextBoard
-                    , turn = nextTurn
-                    , isBoardFull = isBoardFull
-                }
-                    ! [ nextCmd ]
+                if nextWinner then
+                    { model | hasWinner = True, board = nextBoard } ! []
+                else
+                    { model
+                        | board = nextBoard
+                        , turn = nextTurn
+                        , isBoardFull = isBoardFull
+                    }
+                        ! [ nextCmd ]
 
         Reset ->
             initModel ! []
@@ -180,8 +225,14 @@ view model =
             , div [ box, onClick (Mark 8) ] [ text (getValue 8 model) ]
             ]
         , div [ buttons ]
-            [ if model.isBoardFull then
+            [ if model.isBoardFull || model.hasWinner then
                 button [ onClick Reset ] [ text "Reset" ]
+              else
+                text ""
+            ]
+        , div [ winner ]
+            [ if model.hasWinner then
+                text (model.turn ++ " has won!")
               else
                 text ""
             ]

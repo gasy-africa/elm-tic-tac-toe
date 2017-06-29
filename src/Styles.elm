@@ -57,3 +57,10 @@ containerChooseButtons =
     style
         [ ( "min-height", "60px" )
         ]
+
+
+winner : Html.Attribute msg
+winner =
+    style
+        [ ( "min-height", "60px" )
+        ]
