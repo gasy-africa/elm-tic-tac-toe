@@ -25,12 +25,13 @@ type alias Model =
     , isBoardFull : Bool
     , hasSetPlayer : Bool
     , hasWinner : Bool
+    , hasStarted : Bool
     }
 
 
 initModel : Model
 initModel =
-    Model "X" "O" "X" [ "", "", "", "", "", "", "", "", "" ] False False False
+    Model "X" "O" "X" [ "", "", "", "", "", "", "", "", "" ] False False False False
 
 
 init : ( Model, Cmd Msg )
@@ -141,6 +142,7 @@ update msg model =
                         | board = nextBoard
                         , turn = nextTurn
                         , isBoardFull = isBoardFull
+                        , hasStarted = True
                     }
                         ! [ nextCmd ]
 
@@ -200,11 +202,17 @@ view model =
         [ div []
             [ if not model.hasSetPlayer then
                 div [ containerChooseButtons ]
-                    [ text (toUpper "Choose Player")
-                    , div [ chooseButtons ]
-                        [ button [ onClick (SetPlayer "X") ] [ text "Player X" ]
-                        , button [ onClick (SetPlayer "O") ] [ text "Player O" ]
-                        ]
+                    [ if model.hasStarted then
+                        text ""
+                      else
+                        text (toUpper "Choose Player")
+                    , if model.hasStarted then
+                        text ""
+                      else
+                        div [ chooseButtons ]
+                            [ button [ onClick (SetPlayer "X") ] [ text "Player X" ]
+                            , button [ onClick (SetPlayer "O") ] [ text "Player O" ]
+                            ]
                     ]
               else
                 div [ containerChooseButtons ] []
