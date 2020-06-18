@@ -1,5 +1,6 @@
 module Main exposing (..)
 
+import Browser
 import Html exposing (Html, div, text, button)
 import Html.Events exposing (onClick)
 import List exposing (all, any, filter)
@@ -113,7 +114,7 @@ update msg model =
             let
                 nextBoard =
                     if getValue int model == "" then
-                        withDefault [] (setAt int model.turn model.board)
+                        withDefault [] (Just (setAt int model.turn model.board))
                     else
                         model.board
 
@@ -136,18 +137,19 @@ update msg model =
                         Cmd.none
             in
                 if nextWinner then
-                    { model | hasWinner = True, board = nextBoard } ! []
+                    ( { model | hasWinner = True, board = nextBoard } , Cmd.none )
+
                 else
-                    { model
+                    ( { model
                         | board = nextBoard
                         , turn = nextTurn
                         , isBoardFull = isBoardFull
                         , hasStarted = True
                     }
-                        ! [ nextCmd ]
+                        , nextCmd )
 
         Reset ->
-            initModel ! []
+            ( initModel , Cmd.none )
 
         Rand num ->
             let
@@ -155,18 +157,18 @@ update msg model =
                     getValue num model /= ""
             in
                 if hasValue then
-                    model ! [ randoInt ]
+                    ( model , randoInt )
                 else
                     update (Mark num) model
 
         SetPlayer str ->
-            { model
+            ({ model
                 | player1 = str
                 , player2 = handleChangeTurn str
                 , turn = str
                 , hasSetPlayer = True
             }
-                ! []
+                , Cmd.none)
 
 
 subscriptions : Model -> Sub Msg
@@ -198,10 +200,10 @@ getValue int model =
 
 view : Model -> Html Msg
 view model =
-    div [ container ]
+    div   container
         [ div []
             [ if not model.hasSetPlayer then
-                div [ containerChooseButtons ]
+                div   containerChooseButtons
                     [ if model.hasStarted then
                         text ""
                       else
@@ -209,36 +211,36 @@ view model =
                     , if model.hasStarted then
                         text ""
                       else
-                        div [ chooseButtons ]
+                        div   chooseButtons
                             [ button [ onClick (SetPlayer "X") ] [ text "Player X" ]
                             , button [ onClick (SetPlayer "O") ] [ text "Player O" ]
                             ]
                     ]
               else
-                div [ containerChooseButtons ] []
+                div   containerChooseButtons []
             ]
-        , div [ innerContainer ]
-            [ div [ box, onClick (Mark 0) ] [ text (getValue 0 model) ]
-            , div [ box, onClick (Mark 1) ] [ text (getValue 1 model) ]
-            , div [ box, onClick (Mark 2) ] [ text (getValue 2 model) ]
+        , div   innerContainer
+            [ div (box (onClick (Mark 0))) [ text (getValue 0 model) ]
+            , div (box (onClick (Mark 1))) [ text (getValue 1 model) ]
+            , div (box (onClick (Mark 2))) [ text (getValue 2 model) ]
             ]
-        , div [ innerContainer ]
-            [ div [ box, onClick (Mark 3) ] [ text (getValue 3 model) ]
-            , div [ box, onClick (Mark 4) ] [ text (getValue 4 model) ]
-            , div [ box, onClick (Mark 5) ] [ text (getValue 5 model) ]
+        , div   innerContainer
+            [ div (box (onClick (Mark 3))) [ text (getValue 3 model) ]
+            , div (box (onClick (Mark 4))) [ text (getValue 4 model) ]
+            , div (box (onClick (Mark 5))) [ text (getValue 5 model) ]
             ]
-        , div [ innerContainer ]
-            [ div [ box, onClick (Mark 6) ] [ text (getValue 6 model) ]
-            , div [ box, onClick (Mark 7) ] [ text (getValue 7 model) ]
-            , div [ box, onClick (Mark 8) ] [ text (getValue 8 model) ]
+        , div   innerContainer
+            [ div (box (onClick (Mark 6))) [ text (getValue 6 model) ]
+            , div (box (onClick (Mark 7))) [ text (getValue 7 model) ]
+            , div (box (onClick (Mark 8))) [ text (getValue 8 model) ]
             ]
-        , div [ buttons ]
+        , div   buttons
             [ if model.isBoardFull || model.hasWinner then
                 button [ onClick Reset ] [ text "Reset" ]
               else
                 text ""
             ]
-        , div [ winner ]
+        , div   winner
             [ if model.hasWinner then
                 text (model.turn ++ " has won!")
               else
@@ -251,10 +253,10 @@ view model =
 -- MAIN
 
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
-        { init = init
+    Browser.element
+        { init = \_ -> init
         , update = update
         , subscriptions = subscriptions
         , view = view

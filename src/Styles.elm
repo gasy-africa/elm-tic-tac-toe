@@ -4,63 +4,57 @@ import Html
 import Html.Attributes exposing (style)
 
 
-container : Html.Attribute msg
+container : List ( Html.Attribute msg )
 container =
-    style
-        [ ( "display", "flex" )
-        , ( "flex-direction", "column" )
-        , ( "justify-content", "center" )
-        , ( "align-items", "center" )
-        , ( "widht", "100%" )
-        , ( "height", "100vh" )
+        [ style "display" "flex"
+        , style "flex-direction" "column"
+        , style "justify-content" "center"
+        , style "align-items" "center"
+        , style "widht" "100%"
+        , style "height" "100vh"
         ]
 
-
-innerContainer : Html.Attribute msg
+ 
+innerContainer : List ( Html.Attribute msg )
 innerContainer =
-    style
-        [ ( "display", "flex" )
+        [ style "display" "flex"
         ]
 
 
-box : Html.Attribute msg
-box =
-    style
-        [ ( "width", "100px" )
-        , ( "height", "100px" )
-        , ( "border", "1px solid black" )
-        , ( "display", "flex" )
-        , ( "justify-content", "center" )
-        , ( "align-items", "center" )
+box : Html.Attribute msg -> List ( Html.Attribute msg )
+box event =
+        [ style "width" "100px"
+        , style "height" "100px"
+        , style "border" "1px solid black"
+        , style "display" "flex"
+        , style "justify-content" "center"
+        , style "align-items" "center"
+        , event
         ]
 
 
-buttons : Html.Attribute msg
+buttons : List ( Html.Attribute msg )
 buttons =
-    style
-        [ ( "padding-top", "20px" )
-        , ( "min-height", "40px" )
+        [ style "padding-top" "20px"
+        , style "min-height" "40px"
         ]
 
 
-chooseButtons : Html.Attribute msg
+chooseButtons : List ( Html.Attribute msg )
 chooseButtons =
-    style
-        [ ( "display", "flex" )
-        , ( "justify-content", "space-between" )
-        , ( "padding-bottom", "20px" )
+        [ style "display" "flex"
+        , style "justify-content" "space-between"
+        , style "padding-bottom" "20px"
         ]
 
 
-containerChooseButtons : Html.Attribute msg
+containerChooseButtons : List ( Html.Attribute msg )
 containerChooseButtons =
-    style
-        [ ( "min-height", "60px" )
+        [ style "min-height" "60px"
         ]
 
 
-winner : Html.Attribute msg
+winner : List ( Html.Attribute msg )
 winner =
-    style
-        [ ( "min-height", "60px" )
+        [ style "min-height" "60px"
         ]
