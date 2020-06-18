@@ -17,7 +17,7 @@ $ elm install elm/random
 $ elm install elm-community/list-extra
 ```
 
-See <https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md>
+See <https://github.com/elm/compiler/blob/master/docs/upgrade-instructions/0.19.1.md>
 and the documentation for your dependencies for more information.
 
 Here are some common upgrade steps that you will need to do manually:
